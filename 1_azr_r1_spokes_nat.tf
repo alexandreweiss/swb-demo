@@ -2,40 +2,45 @@ module "azr_r1_spoke_app1_nata" {
   source  = "terraform-aviatrix-modules/mc-spoke/aviatrix"
   version = "1.6.7"
 
-  cloud        = "Azure"
-  name         = "azr-${var.azr_r1_location_short}-spoke-${var.application_1}-${var.customer_name}"
-  cidr         = var.azr_r1_spoke_app1_nat_cidr
-  region       = var.azr_r1_location
-  account      = var.azr_account
-  transit_gw   = module.azr_transits.region_transit_map["${var.azr_r1_location}"][0]
-  attached     = true
-  ha_gw        = false
-  single_az_ha = false
+  cloud                            = "Azure"
+  name                             = "azr-${var.azr_r1_location_short}-snata-${var.application_1}-${var.customer_name}"
+  cidr                             = var.azr_r1_spoke_app1_nat_cidr
+  region                           = var.azr_r1_location
+  account                          = var.azr_account
+  transit_gw                       = module.azr_transits.region_transit_map["${var.azr_r1_location}"][0]
+  attached                         = true
+  ha_gw                            = false
+  single_az_ha                     = false
+  included_advertised_spoke_routes = "${var.azr_r1_spoke_app1_nata_advertised_ip}/32"
 }
 
 module "azr_r1_spoke_app1_natb" {
   source  = "terraform-aviatrix-modules/mc-spoke/aviatrix"
   version = "1.6.7"
 
-  cloud        = "Azure"
-  name         = "azr-${var.azr_r1_location_short}-spoke-${var.application_1}-${var.customer_name}"
-  cidr         = var.azr_r1_spoke_app1_nat_cidr
-  region       = var.azr_r1_location
-  account      = var.azr_account
-  transit_gw   = module.azr_transits.region_transit_map["${var.azr_r1_location}"][0]
-  attached     = true
-  ha_gw        = false
-  single_az_ha = false
+  cloud                            = "Azure"
+  name                             = "azr-${var.azr_r1_location_short}-snatb-${var.application_1}-${var.customer_name}"
+  cidr                             = var.azr_r1_spoke_app1_nat_cidr
+  region                           = var.azr_r1_location
+  account                          = var.azr_account
+  transit_gw                       = module.azr_transits.region_transit_map["${var.azr_r1_location}"][0]
+  attached                         = true
+  ha_gw                            = false
+  single_az_ha                     = false
+  included_advertised_spoke_routes = "${var.azr_r1_spoke_app1_natb_advertised_ip}/32"
+  depends_on                       = [module.azr_r1_spoke_app1_nata_rules]
 }
 
 ## Deploy Linux as Application 1 server
 
 data "aviatrix_vpc" "azr_r1_spoke_app1_nata_vpc" {
-  name = module.azr_r1_spoke_app1_nata.vpc.name
+  name       = module.azr_r1_spoke_app1_nata.vpc.name
+  depends_on = [module.azr_r1_spoke_app1_nata]
 }
 
 data "aviatrix_vpc" "azr_r1_spoke_app1_natb_vpc" {
-  name = module.azr_r1_spoke_app1_natb.vpc.name
+  name       = module.azr_r1_spoke_app1_natb.vpc.name
+  depends_on = [module.azr_r1_spoke_app1_natb]
 }
 
 module "azr_r1_app1_vm_nata" {
@@ -51,8 +56,6 @@ module "azr_r1_app1_vm_nata" {
   resource_group_name = data.aviatrix_vpc.azr_r1_spoke_app1_nata_vpc.resource_group
   customer_name       = var.customer_name
   admin_password      = var.vm_password
-  depends_on = [
-  ]
 }
 
 module "azr_r1_app1_vm_natb" {
@@ -68,8 +71,6 @@ module "azr_r1_app1_vm_natb" {
   resource_group_name = data.aviatrix_vpc.azr_r1_spoke_app1_natb_vpc.resource_group
   customer_name       = var.customer_name
   admin_password      = var.vm_password
-  depends_on = [
-  ]
 }
 
 # NAT rule configuration for each spoke

@@ -2,15 +2,16 @@ module "azr_r2_spoke_app1" {
   source  = "terraform-aviatrix-modules/mc-spoke/aviatrix"
   version = "1.6.7"
 
-  cloud        = "Azure"
-  name         = "azr-${var.azr_r2_location_short}-spoke-${var.application_1}-${var.customer_name}"
-  cidr         = var.azr_r2_spoke_app1_cidr
-  region       = var.azr_r2_location
-  account      = var.azr_account
-  transit_gw   = module.azr_transits.region_transit_map["${var.azr_r2_location}"][0]
-  attached     = true
-  ha_gw        = false
-  single_az_ha = false
+  cloud          = "Azure"
+  name           = "azr-${var.azr_r2_location_short}-spoke-${var.application_1}-${var.customer_name}"
+  cidr           = var.azr_r2_spoke_app1_cidr
+  region         = var.azr_r2_location
+  account        = var.azr_account
+  transit_gw     = module.azr_transits.region_transit_map["${var.azr_r2_location}"][0]
+  attached       = true
+  ha_gw          = false
+  single_az_ha   = false
+  single_ip_snat = true
 }
 
 ## Deploy Linux as Application 1 server
@@ -18,6 +19,15 @@ module "azr_r2_spoke_app1" {
 data "aviatrix_vpc" "azr_r2_spoke_app1_vpc" {
   depends_on = [module.azr_r2_spoke_app1]
   name       = module.azr_r2_spoke_app1.vpc.name
+}
+
+data "template_file" "azr_r2_app1_vm_config" {
+  template = file("${path.module}/2_config_azr_r2_app1_vm.tpl")
+
+  vars = {
+    "application_1" = var.application_1
+    "region"        = var.azr_r2_location
+  }
 }
 
 module "azr_r2_app1_vm" {
@@ -33,9 +43,10 @@ module "azr_r2_app1_vm" {
   resource_group_name = data.aviatrix_vpc.azr_r2_spoke_app1_vpc.resource_group
   customer_name       = var.customer_name
   admin_password      = var.vm_password
-  depends_on = [
-  ]
+  custom_data         = base64encode(data.template_file.azr_r2_app1_vm_config.rendered)
 }
+
+
 
 module "azr_r2_spoke_app2" {
   source  = "terraform-aviatrix-modules/mc-spoke/aviatrix"

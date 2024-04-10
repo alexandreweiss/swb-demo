@@ -18,14 +18,29 @@ module "azr_r1_guacamole_vm" {
   ]
 }
 
+# Add an inbound security rule on azr_r1_guacamole_vm to allow HTTPS traffic
+resource "azurerm_network_security_rule" "guacamole_https" {
+  name                        = "Allow-HTTPS"
+  priority                    = 100
+  direction                   = "Inbound"
+  access                      = "Allow"
+  protocol                    = "Tcp"
+  source_port_range           = "*"
+  destination_port_range      = "443"
+  source_address_prefix       = "*"
+  destination_address_prefix  = "*"
+  resource_group_name         = data.aviatrix_vpc.azr_r1_spoke_app1_vpc.resource_group
+  network_security_group_name = module.azr_r1_guacamole_vm.nsg_name
+}
+
 data "template_file" "guacamole_config" {
   template = file("${path.module}/3_guacamole.tpl")
 
   vars = {
     hostname_r1_app1             = module.azr_r1_app1_vm.vm_private_ip
     hostname_r1_app2             = module.azr_r1_app2_vm.vm_private_ip
-    hostname_r2_app1             = module.azr_r1_app1_vm.vm_private_ip
-    hostname_r2_app2             = module.azr_r1_app2_vm.vm_private_ip
+    hostname_r2_app1             = module.azr_r2_app1_vm.vm_private_ip
+    hostname_r2_app2             = module.azr_r2_app2_vm.vm_private_ip
     hostname_r1_spoke_a_app1_nat = var.azr_r1_spoke_app1_nata_advertised_ip
     hostname_r1_spoke_b_app1_nat = var.azr_r1_spoke_app1_natb_advertised_ip
     azr_r1_location_short        = var.azr_r1_location_short
@@ -34,17 +49,6 @@ data "template_file" "guacamole_config" {
     application_2                = var.application_2
     vm_password                  = var.vm_password
     username                     = "admin-lab"
-  }
-}
-
-data "template_cloudinit_config" "config" {
-  gzip          = true
-  base64_encode = true
-
-  part {
-    content_type = "text/x-shellscript"
-    content      = data.template_file.guacamole_config.rendered
-    filename     = "script.sh"
   }
 }
 

@@ -37,37 +37,37 @@ sudo mkdir /etc/guacamole
 
 echo "<user-mapping>
   <authorize username=\"guacadmin\" password=\"${vm_password}\">
-    <connection name=\"aws-${azr_r1_location_short}-${application_1}\">
+    <connection name=\"First region : ${azr_r1_location_short}-${application_1}\">
       <protocol>ssh</protocol>
       <param name=\"hostname\">${hostname_r1_app1}</param>
       <param name=\"username\">admin-lab</param>
       <param name=\"password\">${vm_password}</param>
     </connection>
-    <connection name=\"aws-${azr_r1_location_short}-${application_2}\">
+    <connection name=\"First region : ${azr_r1_location_short}-${application_2}\">
       <protocol>ssh</protocol>
       <param name=\"hostname\">${hostname_r1_app2}</param>
       <param name=\"username\">admin-lab</param>
       <param name=\"password\">${vm_password}</param>
     </connection>
-    <connection name=\"aws-${azr_r2_location_short}-${application_1}\">
+    <connection name=\"Second region : ${azr_r2_location_short}-${application_1}\">
       <protocol>ssh</protocol>
       <param name=\"hostname\">${hostname_r2_app1}</param>
       <param name=\"username\">admin-lab</param>
       <param name=\"password\">${vm_password}</param>
     </connection>
-    <connection name=\"aws-${azr_r2_location_short}-${application_2}\">
+    <connection name=\"Second region : ${azr_r2_location_short}-${application_2}\">
       <protocol>ssh</protocol>
       <param name=\"hostname\">${hostname_r2_app2}</param>
       <param name=\"username\">admin-lab</param>
       <param name=\"password\">${vm_password}</param>
     </connection>
-    <connection name=\"aws-${azr_r1_location_short}-${application_1}-spoke-a(vip:${hostname_r1_spoke_a_app1_nat})\">
+    <connection name=\"First region : ${azr_r1_location_short}-${application_1}-nat-a (vip: ${hostname_r1_spoke_a_app1_nat})\">
       <protocol>ssh</protocol>
       <param name=\"hostname\">${hostname_r1_spoke_a_app1_nat}</param>
       <param name=\"username\">admin-lab</param>
       <param name=\"password\">${vm_password}</param>
     </connection>
-    <connection name=\"aws-${azr_r1_location_short}-${application_1}-spoke-b(vip:${hostname_r1_spoke_b_app1_nat})\">
+    <connection name=\"First region : ${azr_r1_location_short}-${application_1}-nat-b (vip: ${hostname_r1_spoke_b_app1_nat})\">
       <protocol>ssh</protocol>
       <param name=\"hostname\">${hostname_r1_spoke_b_app1_nat}</param>
       <param name=\"username\">admin-lab</param>
@@ -110,6 +110,11 @@ server {
 	add_header X-Content-Type-Options nosniff;
 	access_log  /var/log/nginx/guac_access.log;
 	error_log  /var/log/nginx/guac_error.log;
+	location /app {
+		    proxy_pass http://${hostname_r2_app1}/;
+		    proxy_buffering off;
+		    proxy_http_version 1.1;
+	}
 	location / {
 		    proxy_pass http://localhost:8080/guacamole/;
 		    proxy_buffering off;
