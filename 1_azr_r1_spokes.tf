@@ -16,7 +16,8 @@ module "azr_r1_spoke_app1" {
 ## Deploy Linux as Application 1 server
 
 data "aviatrix_vpc" "azr_r1_spoke_app1_vpc" {
-  name = module.azr_r1_spoke_app1.vpc.name
+  name       = module.azr_r1_spoke_app1.vpc.name
+  depends_on = [module.azr_r1_spoke_app1]
 }
 
 data "template_file" "azr_r1_app1_vm_config" {
@@ -65,7 +66,8 @@ module "azr_r1_spoke_app2" {
 ## Deploy Linux as Application 2 server
 
 data "aviatrix_vpc" "azr_r1_spoke_app2_vpc" {
-  name = module.azr_r1_spoke_app2.vpc.name
+  name       = module.azr_r1_spoke_app2.vpc.name
+  depends_on = [module.azr_r1_spoke_app2]
 }
 
 module "azr_r1_app2_vm" {
