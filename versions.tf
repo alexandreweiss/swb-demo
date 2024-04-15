@@ -4,12 +4,12 @@ terraform {
       source = "aviatrixsystems/aviatrix"
     }
   }
-  cloud {
-    organization = "ananableu"
-    workspaces {
-      name = "swb-demo"
-    }
-  }
+  # cloud {
+  #   organization = "ananableu"
+  #   workspaces {
+  #     name = "swb-demo"
+  #   }
+  # }
 }
 
 provider "aviatrix" {

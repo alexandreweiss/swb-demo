@@ -83,11 +83,6 @@ variable "azr_r2_spoke_app2_cidr" {
   default     = "10.22.0.0/24"
 }
 
-variable "source_ip_cidrs" {
-  description = "Source IP CIDRs to allow inbound connection to Guacamole"
-  type        = list(string)
-}
-
 variable "application_1" {
   description = "Name of application 1"
   default     = "MyApp1"
