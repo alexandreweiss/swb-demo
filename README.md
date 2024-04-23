@@ -29,7 +29,7 @@ Diagram of the overall architecture :
 - At least one Azure subscription,
 - An account being able to create SPN,
 - Subscribe to Aviatrix offers :
-  - [Aviatrix Secure Cloud Networking (Includes Free Trial)](https://portal.azure.com/#create/aviatrix-systems.aviatrix-controller-abu-saas) 
+  - [Aviatrix Secure Cloud Networking](https://portal.azure.com/#create/aviatrix-systems.aviatrix-controller-abu-saas) 
   - [Azure Marketplace: Aviatrix Secure Networking Platform - BYOL](https://portal.azure.com/#create/aviatrix-systems.aviatrix-bundle-payg)
   - [Azure Marketplace: Aviatrix CoPilot](https://portal.azure.com/#create/aviatrix-systems.aviatrix-copilot)
   
